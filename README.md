@@ -1,42 +1,59 @@
-# Regime-Shift: Macro-Aware Tactical Asset Allocation Engine
+# Summer of Quant Advanced Project
+# 📈 Regime-Shift: A "Smart" Asset Allocation Engine
 
-## Overview
-This repository contains a dynamic, macro-aware portfolio allocation system that detects hidden market regimes and automatically adjusts asset weights between Equities, Bonds, and Gold. By utilizing a Hidden Markov Model (HMM) and strict walk-forward validation, the engine intelligently navigates Bull, Bear, and Crisis markets without falling victim to lookahead bias.
 
----
+In one simple sentence: **I built a program that looks at market data, figures out if the market is calm, falling, or in a full-blown crisis, and automatically reshuffles a portfolio (between stocks, bonds, and gold) to match the current mood**.
 
-## 1. Key Design Decisions
+## 🤔 The Problem: Why are we doing this?
+Most simple investment portfolios just pick fixed weights—say, 60% stocks and 40% bonds—and never change them. That works perfectly fine when markets behave normally. But what happens during a sudden crash? A fixed split falls apart because it has no way of knowing the world has changed. 
 
-### Why 3 Regimes?
-We modeled the market using **3 hidden states** (Bull, Bear, Crisis). Market behavior typically falls into these distinct categories:
-*   **Bull:** Low volatility, steady upward momentum.
-*   **Bear:** Moderate-to-high volatility, negative momentum.
-*   **Crisis:** Extreme volatility, violent price swings, and panic.
-
-Restricting the model to three states prevents overfitting and ensures that the optimizer receives clear, actionable signals rather than noisy, ambiguous micro-regimes.
-
-### Why These Specific Features?
-The HMM relies on features that capture both the *direction* and the *uncertainty* of the market:
-*   **126-day Momentum:** Represents the 6-month macro trend using rolling windows. It helps the model understand the broader direction of the market rather than getting faked out by weekly noise.
-*   **21-day Realized Volatility:** Captures the immediate, 1-month realized uncertainty of the market using a rolling standard deviation of returns.
-*   **VIX (India VIX):** A forward-looking measure of market fear and implied volatility.
-*   *Note on Smoothing:* We applied a 21-day Simple Moving Average (SMA) to these features. This acts as a low-pass filter, preventing the HMM from rapidly oscillating between states due to daily data spikes.
-
-### Portfolio Optimization Logic
-Instead of a static 60/40 allocation, we use **Convex Optimization (`cvxpy`)** with strict, regime-specific constraints to mathematically pick the best portfolio weights[cite: 2]:
-*   **Bull Regime:** Maximizes risk-adjusted return with a low risk penalty ($\gamma = 0.5$) and a hard constraint to hold at least 60% equities.
-*   **Bear Regime:** A defensive posture with a higher risk penalty ($\gamma = 2.0$) that caps equities at 40% and requires at least 20% in bonds.
-*   **Crisis Regime:** Solves for the Global Minimum Variance portfolio to minimize volatility[cite: 2]. Equities are capped at a strict 10%, forcing a flight to safety (Bonds $\ge$ 40%, Gold $\ge$ 20%).
-
-### Avoiding Lookahead Bias
-The backtest uses a **Strict Walk-Forward Harness**[cite: 2]. The HMM is trained on an initial 3-year window and steps forward 21 days at a time, being re-fit only on past data at every step[cite: 2]. Feature scaling (Z-scoring) and transition matrices are *only* calculated using past data. The regime assigned to "today" never has access to "tomorrow's" data.
+My goal was to build something smarter: a mathematical system that detects when the "regime" of the market shifts, and dynamically adjusts your investments to protect your capital.
 
 ---
 
-## 2. Installation & Setup
+## 🧠 The "Why": Key Design Decisions
 
-### Prerequisites
-Ensure you have **Python 3.9+** installed[cite: 2]. The project relies on the following libraries[cite: 2]:
+I had to make several crucial choices to ensure this model was both mathematically sound and practical. Here is a peek under the hood at why I built it this way:
 
+### 1. Keeping it Simple with 3 Regimes
+I chose to train the Hidden Markov Model (HMM) to detect exactly **3 hidden states**[cite: 2]. Why? Because market behavior naturally clusters into these distinct categories:
+*   **Bull:** The market is calmly rising[cite: 2].
+*   **Bear:** The market is steadily falling[cite: 2].
+*   **Crisis:** The market is experiencing violent, high-volatility moves[cite: 2].
+*By sticking to just three regimes, we avoid statistical "overfitting." If we gave the model 10 regimes, it would get confused by daily noise. Three regimes give us clear, actionable signals.*
+
+### 2. Choosing the Right Market "Thermometers" (Features)
+A model is only as good as the data you feed it. Instead of just looking at raw prices, I engineered features that capture both the *direction* and the *uncertainty* of the market[cite: 2]:
+*   **Momentum:** Calculated using rolling windows to see if the macro trend is pointing up or down[cite: 2]. 
+*   **Volatility:** Calculated using the rolling standard deviation of returns to measure how wildly prices are swinging[cite: 2].
+*   **Indian VIX:** A natural, forward-looking proxy for market fear[cite: 2].
+
+### 3. Letting Stats Drive the Weights (Convex Optimization)
+Instead of guessing how much of our money should be in stocks versus bonds, I used **convex optimization** to mathematically pick the best portfolio weights for whatever regime we are currently in[cite: 2]. 
+*   In a **Bull** market, the math optimizes for maximum return[cite: 2]. 
+*   In a **Crisis**, the objective function flips entirely to minimize volatility, automatically forcing a flight to safe assets[cite: 2]. 
+
+### 4. Keeping the Math Honest (No Time-Traveling!)
+The easiest trap to fall into when building financial models is **lookahead bias**—accidentally letting the model peek at future data[cite: 2]. To prevent the model from "cheating," I built a strict **walk-forward validation harness**[cite: 2]. The HMM is re-fit only using past data at every single step, moving forward through time[cite: 2]. This ensures our testing is grounded in reality.
+
+### 5. Staying Grounded in Reality (Transaction Costs)
+Trading isn't free. If a model rapidly flips between assets every two days, it might look great on paper, but the transaction costs will quietly destroy your real-world returns[cite: 2]. To reflect reality, I explicitly modeled a **5-10 basis point transaction cost** for every rebalance[cite: 2]. 
+
+---
+
+## 🛠️ The Tech Stack
+*   **Python 3.9+**[cite: 2]
+*   **yFinance:** To pull the daily returns for our assets and the VIX[cite: 2].
+*   **hmmlearn:** The statistical brains behind detecting the hidden market regimes[cite: 2].
+*   **CVXPY:** The optimization engine that solves for our exact portfolio weights[cite: 2].
+*   **Pandas, NumPy, & Matplotlib:** For wrangling data and generating our visualizations[cite: 2].
+
+---
+
+## 🚀 How to Run It & Reproduce My Results
+
+You don't need to be a math whiz to test this out! The entire pipeline—from downloading data to generating the final backtest results—runs top to bottom in one go[cite: 2].
+
+**1. Install the required libraries:**
 ```bash
 pip install numpy pandas matplotlib yfinance hmmlearn cvxpy scikit-learn scipy
