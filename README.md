@@ -16,7 +16,7 @@ My goal was to build something smarter: a mathematical system that detects when 
 I had to make several crucial choices to ensure this model was both mathematically sound and practical. Here is a peek under the hood at why I built it this way:
 
 ### 1. Keeping it Simple with 3 Regimes
-I chose to train the Hidden Markov Model (HMM) to detect exactly **3 hidden states**[cite: 2]. Why? Because market behavior naturally clusters into these distinct categories:
+I chose to train the Hidden Markov Model (HMM) to detect exactly **3 hidden states**. Why? Because market behavior naturally clusters into these distinct categories:
 *   **Bull:** The market is calmly rising.
 *   **Bear:** The market is steadily falling.
 *   **Crisis:** The market is experiencing violent, high-volatility moves.
