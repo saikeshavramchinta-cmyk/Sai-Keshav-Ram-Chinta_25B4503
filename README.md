@@ -53,7 +53,8 @@ Trading isn't free. If a model rapidly flips between assets every two days, it m
 ## 🚀 How to Run It & Reproduce My Results
 
 You don't need to be a math whiz to test this out! The entire pipeline—from downloading data to generating the final backtest results—runs top to bottom in one go.
-
+**1. Install the required libraries:**
+### pip install numpy pandas matplotlib yfinance hmmlearn cvxpy scikit-learn scipy
 
 ## 📊 What You'll See in the Output
 When you run the code, it will automatically output a few key things:
