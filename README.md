@@ -54,6 +54,12 @@ Trading isn't free. If a model rapidly flips between assets every two days, it m
 
 You don't need to be a math whiz to test this out! The entire pipeline—from downloading data to generating the final backtest results—runs top to bottom in one go[cite: 2].
 
-**1. Install the required libraries:**
-```bash
-pip install numpy pandas matplotlib yfinance hmmlearn cvxpy scikit-learn scipy
+
+📊 What You'll See in the Output
+When you run the code, it will automatically output a few key things:
+
+The Regime Chart: A plot of the historical price data with colored bands layered on top, showing exactly when the HMM thought we were in a Bull, Bear, or Crisis market[cite: 2].
+
+The Transition Matrix: A matrix showing the probability of the market switching from one state to another (proving that market regimes tend to be "sticky")[cite: 2].
+
+The Scorecard: A performance summary comparing our smart dynamic strategy against a static 60/40 portfolio and an equal-weight portfolio[cite: 2]. We compare them fairly using the Sharpe ratio, Sortino ratio, max drawdown, Calmar ratio, and turnover[cite: 2].
