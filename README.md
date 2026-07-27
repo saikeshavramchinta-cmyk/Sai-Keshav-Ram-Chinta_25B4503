@@ -1,6 +1,8 @@
 # Summer of Quant Advanced Project
 # 📈 Regime-Shift: A "Smart" Asset Allocation Engine
 
+## Note: The whole code is available in **Submission_Code.ipynb**
+
 
 In one simple sentence: **I built a program that looks at market data, figures out if the market is calm, falling, or in a full-blown crisis, and automatically reshuffles a portfolio (between stocks, bonds, and gold) to match the current mood**.
 
